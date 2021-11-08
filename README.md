@@ -6,7 +6,7 @@ Cliente-Servidor y Consultas básicas
   **Verificador** : Irina Castella Torrus  
   **Comunicador** : Oscar Samblas Chavernas  
 # Version 2
-Cliente-Servidor y Consultas básicas  
+Recurrencia e inicio de interfaz gráfica
   **Comunicador** : Tomi Riccardo Sandu Lefcu  
   **Manager** : Irina Castella Torrus  
   **Verificador** : Oscar Samblas Chavernas  
