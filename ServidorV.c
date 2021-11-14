@@ -11,8 +11,6 @@
 
 typedef struct{
 	char Usuario[20];
-	char Password [20];
-	int id;
 	int Socket;
 }Jugador;
 
@@ -36,88 +34,68 @@ typedef struct{
 //Declaramos parametros
 char peticion[512];
 char respuesta[512];
-ListaJugadores lista_J;
+
 ListaPartidas lista_P;
 int num_sockets;
 int sockets[100];
 ListaJugadores lista;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;	//inicializar la exclusion
 
-
-void InicializarListaJugadores(ListaJugadores *lista,MYSQL *conn){
-	MYSQL_RES *resultado;
-	MYSQL_ROW fila;
-	char consulta[500];
-	int i = 0;
-	sprintf (consulta, "SELECT * from jugador");
-	int err;
-	err = mysql_query(conn, consulta);
-	
-	resultado = mysql_store_result(conn);
-	fila = mysql_fetch_row(resultado);
-	while(fila!= NULL){
-		lista->jugadores[i].Socket = 0;
-	}
-	
-}
-void ListaConectados (ListaJugadores *lista, char conectados[200]){
-	int i = 0;
-	int cont = 0;
-	conectados[0] = '\0';
-	while (i<lista->num){
-		if (lista->jugadores[i].Socket > 0){
-			sprintf(conectados,"%s-%s", conectados, lista->jugadores[i].Usuario);
-			cont++;
-		}
-		i++;
-	}
-	sprintf(conectados,"%d-%s",cont,conectados);
-}
-int AddConectado(ListaJugadores *lista, char usuario[20], int socket){
+void AddConectado(ListaJugadores *lista, char usuario[20], int socket){
+	int i= 0;
 	int encontrado = 0;
-	int i = 0;
-	while ((i<lista->num) && (encontrado == 0)){
-		if (strcmp(lista->jugadores[i].Usuario, usuario) == 0)
-			encontrado = 1;
-		else
-			i++;
+	printf("Flag:Lista num = %d\n",lista->num);
+	printf("Flag:Socket = %d\n",socket);
+	printf("Flag:UsuarioAAÃ±adir = %s\n",usuario);
+	while(i< lista->num&& encontrado == 0){
+		if(strcmp(lista->jugadores[i].Usuario,usuario)==0){
+			
+			encontrado=1;
+			printf("Flag:Encontrado\n");
+		}
+		i = i+1;
 	}
-	if (encontrado == 1){
-		printf("FLAG4");
-		strcpy(lista->jugadores[i].Usuario, usuario);
-		lista->jugadores[i].Socket = socket;
-		lista->num = lista->num +1;
-		printf("FLAG4");
-		return 1;	//Conectado
+	if(encontrado==0 ){
+		strcpy(lista->jugadores[lista->num].Usuario,usuario);
+		lista->jugadores[lista->num].Socket = socket;
+		lista->num = lista->num +1 ;
+		printf("Flag:AÃ±adidoConectado\n");
 	}
-	else
-		return 0;	//No se ha añadido
-		
 }
 
 int EliminaConectado(ListaJugadores *lista, char usuario[20]){
-	int encontrado = 0;
 	int i = 0;
-	while ((i<lista->num) && (encontrado == 0)){
-		if (strcmp(lista->jugadores[i].Usuario, usuario) == 0)
-			encontrado = 1;
-		else 
-			i++;
+	while(i< lista->num){
+		if(strcmp(lista->jugadores[i].Usuario,usuario) == 0){
+			strcpy(lista->jugadores[i].Usuario,lista->jugadores[lista->num].Usuario);
+			lista->jugadores[i].Socket = lista->jugadores[lista->num].Socket;
+			strcpy(lista->jugadores[lista->num].Usuario,"");
+			lista->jugadores[lista->num].Socket =0 ;
+			lista->num = lista->num - 1;
+			printf("Flag:Eliminar Conectado\n");
+		}
+		i = i+1;
 	}
-	if (encontrado == 1){
-		strcpy(lista->jugadores[i].Usuario, "");
-		lista->jugadores[i].Socket = -1;
-		lista->num = lista->num -1;
-		return 1;	//Eliminado
-	}
-	else
-		return -1;	//No lo ha eliminado
+	
 }
 
-void EnviarListaConectados(int numSockets, int sockets[100], char conectados[200]){
+void EnviarListaConectados(int numSockets, int sockets[100], ListaJugadores *lista){
 	int i =0;	
-	char envio[200];
+	int j = 0 ;
+	char envio[1024];
+	char conectados[1024];
+	conectados[0] = '\0';
+	while(j<lista->num){
+		strcat(conectados,lista->jugadores[j].Usuario);
+		if(j!= lista->num-1){
+			strcat(conectados,"-");
+		}
+		j++;
+	}
 	sprintf(envio, "99/%s", conectados);	//Asignamos el codigo 99 a enviar la lista de conectados
+	printf("Envio:");
+	printf(envio);
+	printf("\n");
 	while (i<numSockets){		//Escribimos en consola los sockets activos (los conectados)
 		write(sockets[i],envio,strlen(envio));
 		i++;
@@ -147,7 +125,7 @@ int Usuario_Registrado(MYSQL *conn, char nombre_Usuario[20]){
 }
 
 int Password_Check(MYSQL *conn, char password[40], char nombre_Usuario[40]){
-	//Retorna 1 si la contraseña y el usuario pasados por parametro coinciden	
+	//Retorna 1 si la contraseÃ±a y el usuario pasados por parametro coinciden	
 	int checked;
 	MYSQL_RES *resultado;
 	MYSQL_ROW fila;
@@ -168,7 +146,7 @@ int Password_Check(MYSQL *conn, char password[40], char nombre_Usuario[40]){
 		checked = 0;	//No se ha pasado ningun dato, esta vacio
 	
 	else{
-		checked = 1;	//Si la contraseña y el usuario SÍ coinciden
+		checked = 1;	//Si la contraseÃ±a y el usuario SÃ coinciden
 	}
 	return checked;
 }
@@ -186,35 +164,6 @@ void Registrar_Usuario(MYSQL *conn, char nombre_Usuario[20], char password[20], 
 		printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn),mysql_error(conn));
 		exit(1);
 	}
-		
-	mysql_close(conn);
-	exit(0);
-}
-
-int Asignar_ID(MYSQL *conn ){
-	MYSQL_RES *resultado;
-	MYSQL_ROW fila;
-	char request[200];
-	int total = 0;
-	
-	int err;
-	err = mysql_query(conn, request);		//Hacemos la consulta
-	
-	strcpy(request, "Select * from (jugador)");
-	resultado = mysql_store_result(conn);
-	fila=mysql_fetch_row(resultado);
-	
-	if (fila != NULL){
-		while (fila!=NULL){
-			total = total+1;
-			fila = mysql_fetch_row (resultado);
-		}
-		return total;
-	}
-	else
-		return 0;
-	mysql_close(conn);
-	exit(0);
 }
 
 int JugadoresQueJugaronTalDIA (MYSQL *conn, char day[20] ){
@@ -235,13 +184,14 @@ int JugadoresQueJugaronTalDIA (MYSQL *conn, char day[20] ){
 	
 	resultado = mysql_store_result(conn);
 	fila = mysql_fetch_row(resultado);
-
+	
 	while (fila != NULL){
 		if (fila != NULL){
 			num_Jugadores++;
 		}
 		else
 			printf("Ha habido un error");
+		fila = mysql_fetch_row(resultado);
 	return num_Jugadores;
 	}
 	mysql_close(conn);
@@ -303,81 +253,75 @@ void AtenderCliente(void *socket){
 		ret = read(sock_conn,peticion, sizeof(peticion));
 		printf ("Recibido\n");
 		
-		// Tenemos que añadirle la marca de fin de string 
+		// Tenemos que aÃ±adirle la marca de fin de string 
 		// para que no escriba lo que hay despues en el buffer
 		peticion[ret]='\0';
 		respuesta[0] = '\0';
 		conectados[0]='\0';	//marcas de final de linea
 		
 		printf ("Peticion: %s\n",peticion);
-		
 		// vamos a ver que quieren
 		char *p = strtok( peticion, "/");
 		int codigo =  atoi (p);
 		//Tenemos el codigo de la peticion
-		// 1/Juan/contraseña
+		// 1/Juan/contraseÃ±a
 		if (codigo == 0){	//Peticion de desconexion
 			end = 1;	//Fin del bucle
-			printf("FLAG");
-			p = strtok(NULL, "/");	
-			strcpy(desconex,p);
-			printf("FLAG");
-			if(strcmp(desconex,0)!=0){
-				p = strtok(NULL, "/");
-				/*
-				strcpy(nombre_Usuario,p);
-				EliminaConectado(&lista,nombre_Usuario);
-				ListaConectados(&lista,conectados);
-				EnviarListaConectados(num_sockets,sockets,conectados);
-				*/
-			}
+			EliminaConectado(&lista, nombre_Usuario);
+			EnviarListaConectados(num_sockets,sockets,&lista);
+			
 			
 		}
 		else if (codigo == 1){ 		//Peticion de login
 			p = strtok(NULL, "/");
-			strcpy(nombre_Usuario, p);	
-			p = strtok(NULL,"/");
-			strcpy(password, p);
-			registrado = Usuario_Registrado(conn,nombre_Usuario);
-			if (registrado == 0)
-				strcpy(respuesta, "1");	//User not registered
-			else{//Usuario registrado
-				int checked = Password_Check(conn, password, nombre_Usuario);
-				if (checked == 1){
-					strcpy(respuesta, "2");	//Login succesful
-					/*added = AddConectado(&lista, nombre_Usuario, sock_conn);
-					if (added ==1){
-						ListaConectados(&lista, conectados); //nos da el char conectados separados por -
-						EnviarListaConectados(num_sockets,sockets,conectados);
+			printf("Flag: p Value = %s\n",p);
+			if(p == '\0'){
+				printf("Flag:ClienteCrash\n");
+				end=1;
+				codigo=0;
+				EliminaConectado(&lista, nombre_Usuario);
+				EnviarListaConectados(num_sockets,sockets,&lista);
+			}
+			else{
+				strcpy(nombre_Usuario, p);
+				p = strtok(NULL,"/");
+				strcpy(password, p);
+				printf("Flag:1\n");
+				registrado = Usuario_Registrado(conn,nombre_Usuario);
+				printf("Flag:2\n");
+				if (registrado == 0)
+					strcpy(respuesta, "1");	//User not registered
+				else{//Usuario registrado
+					printf("Flag:3: %s, %s\n", password, nombre_Usuario);
+					int checked = Password_Check(conn, password, nombre_Usuario);
+					printf("Flag:4%d\n",checked);
+					if (checked == 1){
+						printf("Flag:5\n");
+						strcpy(respuesta, "2");	//Login succesful
+						AddConectado(&lista, nombre_Usuario, sock_conn);
+						EnviarListaConectados(num_sockets,sockets,&lista);
+						printf("Flag Login2\n");
 					}
-					else
-						printf("Error al añadir \n");*/
-				
-				}
-				else{
-					strcpy(respuesta, "3");	//Password wrong
+					else{
+						strcpy(respuesta, "3");	//Password wrong
+					}
 				}
 			}
+			
 		}
-		else if (codigo == 2){			//Peticion de registro
+		else if (codigo == 2){	//Peticion de registro
 			p = strtok(NULL, "/");
 			strcpy(nombre_Usuario, p);
+			p = strtok(NULL, "/");
 			strcpy(password, p);
 			int num_jugadores;
-			
 			registrado = Usuario_Registrado(conn, nombre_Usuario);
 			if (registrado == 1){	//Usuario YA registrado
 				strcpy(respuesta, "4");
 			}
 			else {			//USUARIO NO REGISTRADO, le registramos
-				int num_jugadores = Asignar_ID(conn) +1; //
 				Registrar_Usuario(conn, nombre_Usuario, password, num_jugadores);
 				strcpy(respuesta, "5");	//Registrado
-				added = AddConectado(&lista, nombre_Usuario, sock_conn);
-				if (added ==1){
-					ListaConectados (&lista, conectados); //nos da el char conectados separados por -
-					EnviarListaConectados(num_sockets,sockets,conectados);			
-				}
 			}
 		}
 		else if (codigo == 4){	//Consulta los jugadores que han jugado con IronMan
@@ -406,15 +350,13 @@ void AtenderCliente(void *socket){
 		}
 		// Se acabo el servicio para este cliente
 	}
-	printf("FLAG");
 	close(sock_conn);
-	printf("FLAG");
 }
 
 int main(int argc, char *argv[]){
 	int n;
 	int sock_conn, sock_listen, ret;
-	int PORT = 9050;
+	int PORT = 9040;
 	struct sockaddr_in serv_adr;
 	if ((sock_listen = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		printf("Error creant socket");
