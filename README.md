@@ -1,4 +1,4 @@
-# Proyecto SO - Grupo M3
+# Proyecto SO - Grupo T9
 # Quoridor
 # Version 1
 Cliente-Servidor y Consultas básicas  
