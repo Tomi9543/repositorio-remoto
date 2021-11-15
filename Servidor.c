@@ -7,7 +7,7 @@
 #include <string.h>
 #include <mysql.h>
 #include <pthread.h>
-
+#include <my_global.h>
 
 typedef struct{
 	char Usuario[20];
@@ -222,7 +222,7 @@ void AtenderCliente(void *socket){
 		exit (1);
 	}
 	
-	conn =mysql_real_connect(conn, "localhost", "root","mysql", "juego",0, NULL, 0);
+	conn =mysql_real_connect(conn, "shiva2.upc.es", "root","mysql", "TG9_juego",0, NULL, 0);
 	if (conn == NULL){
 		printf("Error al crear la conexion");
 		exit(1);
@@ -356,7 +356,7 @@ void AtenderCliente(void *socket){
 int main(int argc, char *argv[]){
 	int n;
 	int sock_conn, sock_listen, ret;
-	int PORT = 9040;
+	int PORT = 50077 ;
 	struct sockaddr_in serv_adr;
 	if ((sock_listen = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		printf("Error creant socket");
