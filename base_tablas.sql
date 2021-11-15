@@ -1,7 +1,7 @@
-DROP DATABASE IF EXISTS juego;
-CREATE DATABASE juego;
+DROP DATABASE IF EXISTS TG9_juego;
+CREATE DATABASE TG9_juego;
 
-USE juego;
+USE TG9_juego;
 
 CREATE TABLE jugador (
 	username Varchar (60),
