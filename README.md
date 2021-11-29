@@ -27,4 +27,5 @@ Conexión entre dos jugadores
   **Manager** : Tomi Riccardo Sandu Lefcu  
   **Comunicador** : Irina Castella Torrus  
   **Verificador** : Oscar Samblas Chavernas  
+  https://drive.google.com/file/d/1b-7qj5grVNcRmzvg3Z0iAra1bnYc52F3/view?usp=sharing
 
