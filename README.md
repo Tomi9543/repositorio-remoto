@@ -16,13 +16,13 @@ Recurrencia en el cliente y actualización automatica de la lista de conectados.
   **Comunicador** : Irina Castella Torrus  
   **Manager** : Oscar Samblas Chavernas  
   https://drive.google.com/file/d/1b-7qj5grVNcRmzvg3Z0iAra1bnYc52F3/view?usp=sharing
-  # Version 4
+# Version 4
 Invitación a partidas y aceptación/rechazo.  
   **Verificador** : Tomi Riccardo Sandu Lefcu  
   **Manager** : Irina Castella Torrus  
   **Comunicador**: Oscar Samblas Chavernas  
 
-  # Version 5
+# Version 5
 Conexión entre dos jugadores. 
  **Manager** : Tomi Riccardo Sandu Lefcu  
  **Comunicador** : Irina Castella Torrus  
