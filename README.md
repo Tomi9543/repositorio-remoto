@@ -21,8 +21,9 @@ Invitación a partidas y aceptación/rechazo.
   **Verificador** : Tomi Riccardo Sandu Lefcu  
   **Manager** : Irina Castella Torrus  
   **Comunicador**: Oscar Samblas Chavernas  
+  
 # Version 5
-Conexión entre dos jugadores. 
+Conexión entre dos jugadores \n
   **Manager** : Tomi Riccardo Sandu Lefcu  
   **Comunicador** : Irina Castella Torrus  
   **Verificador** : Oscar Samblas Chavernas  
