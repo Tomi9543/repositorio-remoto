@@ -24,7 +24,6 @@ Invitación a partidas y aceptación/rechazo.
   
 # Version 5
 Conexión entre dos jugadores 
-
   **Manager** : Tomi Riccardo Sandu Lefcu  
   **Comunicador** : Irina Castella Torrus  
   **Verificador** : Oscar Samblas Chavernas  
