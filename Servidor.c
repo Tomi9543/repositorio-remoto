@@ -7,7 +7,7 @@
 #include <string.h>
 #include <mysql.h>
 #include <pthread.h>
-#include <my_global.h>
+
 
 typedef struct{
 	char Usuario[20];
@@ -20,33 +20,162 @@ typedef struct{
 }ListaJugadores;
 
 typedef struct{
-	int id;
+	Jugador JugadoresPartida[10];
 	char fecha[10];
+	int num_Jugadores;	//Hasta 10 jugadores por partida
 	int duracion_MINUTOS;
 	char ganador[20];
-}Partida;
+}TPartida;
 
-typedef struct{
-	Partida partidas[100];
-	int num;
-}ListaPartidas;
+typedef TPartida TablaPartidas [100];
+
 
 //Declaramos parametros
 char peticion[512];
 char respuesta[512];
 
-ListaPartidas lista_P;
+TablaPartidas Tabla_P;
+int numFilas;
 int num_sockets;
 int sockets[100];
 ListaJugadores lista;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;	//inicializar la exclusion
+
+int CrearPartida(TablaPartidas tabla, char organizador[20], int socket){
+	tabla[numFilas].JugadoresPartida[0].Socket = socket;	//Primer aÒadido a la partida es el que invita
+	strcpy(tabla[numFilas].JugadoresPartida[0].Usuario, organizador);
+	tabla[numFilas].num_Jugadores = 1;
+	tabla[numFilas].duracion_MINUTOS=1;
+	numFilas ++;
+	if (numFilas ==0)
+		return -1;
+	else
+		return 0;
+}
+int DameJugadoresPartida(TablaPartidas tabla, int posicion , char j1[20], char j2[20], char j3[20], char j4[20], char j5[20], char j6[20], char j7[20], char j8[20], char j9[20], char j10[20]){
+	if ((posicion <numFilas)&&(tabla[posicion].duracion_MINUTOS>0)){
+		strcpy(j1, tabla[posicion].JugadoresPartida[0].Usuario);
+		strcpy(j2, tabla[posicion].JugadoresPartida[1].Usuario);
+		strcpy(j3, tabla[posicion].JugadoresPartida[2].Usuario);
+		strcpy(j4, tabla[posicion].JugadoresPartida[3].Usuario);
+		strcpy(j5, tabla[posicion].JugadoresPartida[4].Usuario);
+		strcpy(j6, tabla[posicion].JugadoresPartida[5].Usuario);
+		strcpy(j7, tabla[posicion].JugadoresPartida[6].Usuario);
+		strcpy(j8, tabla[posicion].JugadoresPartida[7].Usuario);
+		strcpy(j9, tabla[posicion].JugadoresPartida[8].Usuario);
+		strcpy(j10, tabla[posicion].JugadoresPartida[9].Usuario);
+		return 0;
+		
+	}
+	else {
+		printf("FLAG FUNCION 2: Error al buscar JUGADORES\n");
+		return -1;
+	}
+	//Si hubiera 5 jugadores, del los ultimos 5 jugadores serian NULL!
+}
+
+int DamePartidaAPartirDeOrganizador(TablaPartidas tabla, char org[20]){
+	int i = 0;
+	int encontrado = 0;
+	while ((i<numFilas) && (encontrado == 0)){
+		if (strcmp(tabla[i].JugadoresPartida[0].Usuario, org) == 0)
+		{
+			encontrado = 1;
+		}
+		else 
+			i++;
+	
+	if (encontrado == 1){
+		return i;
+	}
+	else 
+		return -1;
+	}
+}
+
+int DameFilas(TablaPartidas tabla){
+	int i;
+	int filas = 0;
+	for (i=0; i<100; i++){
+		if (tabla[i].duracion_MINUTOS>0){
+			filas++;
+		}
+	}
+	return filas;
+}
+
+int AddJugadorPartida(TablaPartidas tabla, char j[20], int socket, int partida){
+	int found=0;
+	int m=0;
+	while((m<tabla[partida].num_Jugadores) &&(found ==0)){
+		if (strcmp(tabla[partida].JugadoresPartida[m].Usuario,j) == 0)
+			found =1;
+		else
+			j++;
+	}
+	if (found == 1){
+		tabla[partida].JugadoresPartida[tabla[partida].num_Jugadores].Socket = socket;
+		strcpy(tabla[partida].JugadoresPartida[tabla[partida].num_Jugadores].Usuario, j);
+		tabla[partida].num_Jugadores++;
+		return 1;
+	}
+	else 
+		return -1;
+}
+
+int DameOrganizadorPartida(TablaPartidas tabla, int partida, char organizador[20]){
+	strcpy(organizador, tabla[partida].JugadoresPartida[0].Usuario);
+	if (organizador == NULL){
+		printf("No hay organizador\n");
+	}
+	else
+		printf("Organizador: %s\n", organizador);
+}
+int DameUsuarioAPartirDeSocket(ListaJugadores *lista, int socket, char jugador[20]){
+	int encontrado = 0;
+	int i = 0;
+	while ((i<lista->num) && (encontrado == 0)){
+		if (lista->jugadores[i].Socket == socket){
+			encontrado =1;
+		}
+		else
+			i++;
+	}
+	if (encontrado == 0){
+		printf("FLAG FUNCION 6:Error al Retornar Usuario desde SOcket\n");
+		return 1;
+	}
+	else {
+		strcpy(jugador, lista->jugadores[i].Usuario);
+		return 0;
+	}
+}
+
+
+int DameSocketAPartirDeUsuario(ListaJugadores *lista, char jugador[20]){
+	int encontrado = 0;
+	int i=0;
+	int socket;
+	while ((i<lista->num) && (encontrado == 0)){
+		if (strcmp(lista->jugadores[i].Usuario, jugador)==0){
+			encontrado =1;
+			socket = lista->jugadores[i].Socket;
+		}
+		else 
+			i++;
+	}
+	if (encontrado == 0)
+		return -1;
+	else 
+		return socket;
+}
 
 void AddConectado(ListaJugadores *lista, char usuario[20], int socket){
 	int i= 0;
 	int encontrado = 0;
 	printf("Flag:Lista num = %d\n",lista->num);
 	printf("Flag:Socket = %d\n",socket);
-	printf("Flag:UsuarioAA√±adir = %s\n",usuario);
+	printf("Flag:UsuarioAAÒadir = %s\n",usuario);
 	while(i< lista->num&& encontrado == 0){
 		if(strcmp(lista->jugadores[i].Usuario,usuario)==0){
 			
@@ -59,7 +188,7 @@ void AddConectado(ListaJugadores *lista, char usuario[20], int socket){
 		strcpy(lista->jugadores[lista->num].Usuario,usuario);
 		lista->jugadores[lista->num].Socket = socket;
 		lista->num = lista->num +1 ;
-		printf("Flag:A√±adidoConectado\n");
+		printf("Flag:AÒadidoConectado\n");
 	}
 }
 
@@ -125,7 +254,7 @@ int Usuario_Registrado(MYSQL *conn, char nombre_Usuario[20]){
 }
 
 int Password_Check(MYSQL *conn, char password[40], char nombre_Usuario[40]){
-	//Retorna 1 si la contrase√±a y el usuario pasados por parametro coinciden	
+	//Retorna 1 si la contraseÒa y el usuario pasados por parametro coinciden	
 	int checked;
 	MYSQL_RES *resultado;
 	MYSQL_ROW fila;
@@ -146,7 +275,7 @@ int Password_Check(MYSQL *conn, char password[40], char nombre_Usuario[40]){
 		checked = 0;	//No se ha pasado ningun dato, esta vacio
 	
 	else{
-		checked = 1;	//Si la contrase√±a y el usuario S√ç coinciden
+		checked = 1;	//Si la contraseÒa y el usuario SÕ coinciden
 	}
 	return checked;
 }
@@ -210,8 +339,8 @@ int DamePerdedores (MYSQL *conn, char nombre[20]){
 	MYSQL_RES *resultado;
 	MYSQL_ROW fila;
 	char request [200];
-	
 }
+
 
 void AtenderCliente(void *socket){
 	MYSQL *conn;
@@ -222,7 +351,7 @@ void AtenderCliente(void *socket){
 		exit (1);
 	}
 	
-	conn =mysql_real_connect(conn, "shiva2.upc.es", "root","mysql", "TG9_juego",0, NULL, 0);
+	conn =mysql_real_connect(conn, "localhost", "root","mysql", "juego",0, NULL, 0);
 	if (conn == NULL){
 		printf("Error al crear la conexion");
 		exit(1);
@@ -244,6 +373,10 @@ void AtenderCliente(void *socket){
 	s = (int *) socket;
 	int sock_conn = *s;
 	char respuesta[300];
+	char respuesta_SI_NO[10];
+	char organizador[20];
+	int partida;
+	char invitada[20];
 	
 	while (end == 0){
 		char conectados[512];
@@ -253,7 +386,7 @@ void AtenderCliente(void *socket){
 		ret = read(sock_conn,peticion, sizeof(peticion));
 		printf ("Recibido\n");
 		
-		// Tenemos que a√±adirle la marca de fin de string 
+		// Tenemos que aÒadirle la marca de fin de string 
 		// para que no escriba lo que hay despues en el buffer
 		peticion[ret]='\0';
 		respuesta[0] = '\0';
@@ -264,13 +397,11 @@ void AtenderCliente(void *socket){
 		char *p = strtok( peticion, "/");
 		int codigo =  atoi (p);
 		//Tenemos el codigo de la peticion
-		// 1/Juan/contrase√±a
+		// 1/Juan/contraseÒa
 		if (codigo == 0){	//Peticion de desconexion
 			end = 1;	//Fin del bucle
 			EliminaConectado(&lista, nombre_Usuario);
 			EnviarListaConectados(num_sockets,sockets,&lista);
-			
-			
 		}
 		else if (codigo == 1){ 		//Peticion de login
 			p = strtok(NULL, "/");
@@ -342,6 +473,73 @@ void AtenderCliente(void *socket){
 				printf("Error al contar los jugadores \n");
 			}
 		}
+		else if (codigo == 7){				//AÒadir conectado a la partida
+			int SocketDeLaPersonaInvitada;
+			int added;
+			int correcto = DameUsuarioAPartirDeSocket(&lista, sock_conn, organizador);
+			if (correcto ==0){
+				printf("FLAG_Partida1\n");
+			}
+			else {		//Mensaje tipo: 7/2/Maria
+				sprintf(respuesta,"7/%s", organizador);
+				printf("Respuesta: %s \n", respuesta);
+				p = strtok(NULL,"/");
+				partida = atoi(p);	//Posicion en la tabla
+				int creado = CrearPartida(Tabla_P,organizador,sock_conn);
+				if (creado == -1){
+					printf("Partida no creada\n");
+				}
+				else{
+					printf("Partida creada\n");
+					p = strtok(NULL, "/");
+					while (p!=NULL){
+						strcpy(nombre_Usuario, p);	//Persona a la que queremos invitar a partida
+						int SocketDeLaPersonaInvitada = DameSocketAPartirDeUsuario(&lista,nombre_Usuario);
+						if (SocketDeLaPersonaInvitada==-1)
+							printf("Socket no obtenido\n");
+						else{
+							printf("Socket: %d \n", SocketDeLaPersonaInvitada);
+							added = AddJugadorPartida(Tabla_P, nombre_Usuario, SocketDeLaPersonaInvitada, partida);
+							if (added == -1){
+								printf("Error al aÒadir a la partida");
+							}
+							else{
+								printf("Jugador/a aÒadido/a a partida: Nombre: %s\n", nombre_Usuario);
+							}
+						}
+						p = strtok(NULL,"/");
+					}
+				}
+			}
+		}
+		else if (codigo==8){		//Gestionar la invitacion a partida
+			p = strtok(NULL,"/");
+			partida = atoi(p);
+			printf("ID de Partida: %d\n", partida);
+			int creador = DameOrganizadorPartida(Tabla_P, partida, organizador);
+			int socketOrganizador;
+			if (creador ==-1)
+				printf("Nadie organiza la partida\n");
+			else{
+				printf("Organizador: %s \n", organizador);
+				socketOrganizador = DameSocketAPartirDeUsuario(&lista, organizador);
+				if (socketOrganizador ==-1)
+					printf("Flag2 nadie organiza\n");
+				else{
+					printf("Socket Organizador: %d\n", socketOrganizador);
+					int usuario=DameUsuarioAPartirDeSocket(&lista,sock_conn,invitada);
+					if (usuario == -1)
+						printf("no hay socket de invitado\n");
+					else{
+						printf("Persona invitada: %s\n", invitada);
+						p = strtok(NULL,"/");
+						strcpy(respuesta_SI_NO,p);
+						printf("Respuesta del invitado: %s\n",respuesta_SI_NO);
+						sprintf(respuesta, "8/%d/%s/%s/",partida, invitada, respuesta_SI_NO);
+					}
+				}
+			}
+		}
 		if (codigo != 0)
 		{
 			printf ("Respuesta: %s\n", respuesta);
@@ -356,7 +554,7 @@ void AtenderCliente(void *socket){
 int main(int argc, char *argv[]){
 	int n;
 	int sock_conn, sock_listen, ret;
-	int PORT = 50077 ;
+	int PORT = 9040;
 	struct sockaddr_in serv_adr;
 	if ((sock_listen = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		printf("Error creant socket");
@@ -379,15 +577,21 @@ int main(int argc, char *argv[]){
 	int end = 0;
 	pthread_t thread[100];	//Aqui guardamos los ID de thread de cada usuario
 	
-	while (end ==0){
-		printf("Escuchando\n");
-		sock_conn = accept(sock_listen, NULL, NULL);
-		printf ("He recibido conexion\n");
-		
-		sockets[num_sockets] = sock_conn;
-		pthread_create(&thread[num_sockets],NULL,AtenderCliente,&sockets[num_sockets]);
-		num_sockets= num_sockets +1;
-	}	
-	close(sock_conn);
-}
+	int creada = CrearPartida(Tabla_P, "Manuel", 15);
+	if (creada < 0)
+		printf("Error al crear la tabla \n");
+	else{
+		while (end ==0){
+			printf("Escuchando\n");
+			sock_conn = accept(sock_listen, NULL, NULL);
+			printf ("He recibido conexion\n");
+			
+			sockets[num_sockets] = sock_conn;
+			pthread_create(&thread[num_sockets],NULL,AtenderCliente,&sockets[num_sockets]);
+			num_sockets= num_sockets +1;
+		}	
+		close(sock_conn);
+	} 
+} 
+
 	
