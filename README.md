@@ -31,7 +31,7 @@ Conexión entre dos jugadores
   
 # Version Final
 la version definitiva del juego 
-  **Manager** : Tomi Riccardo Sandu Lefcu
+  **Manager** : Tomi Riccardo Sandu Lefcu  
   **Comunicador** : Irina Castella Torrus  
   **Verificador** : Oscar Samblas Chavernas  
 
