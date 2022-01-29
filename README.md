@@ -34,4 +34,5 @@ la version definitiva del juego
   **Manager** : Tomi Riccardo Sandu Lefcu  
   **Comunicador** : Irina Castella Torrus  
   **Verificador** : Oscar Samblas Chavernas  
+  El cliente pesa demasiado para github : https://drive.google.com/file/d/1FlQXeFn7vwR486nrJgLUU3Sc72syyrlf/view?usp=sharing
 
