@@ -18,7 +18,7 @@ typedef struct{
 typedef struct{
 	char Usuario[20];
 	int Socket;
-	int EnPartida; // 1 si est· en una sala o partida/ 0 si no
+	int EnPartida; // 1 si est√° en una sala o partida/ 0 si no
 	Personaje Personaje;
 }Jugador;
 typedef struct{
@@ -82,7 +82,7 @@ void AddConectado(ListaJugadores *lista, char usuario[20], int socket){
 		strcpy(lista->jugadores[lista->num].Usuario,usuario);
 		lista->jugadores[lista->num].Socket = socket;
 		lista->num = lista->num +1 ;
-		printf("Flag:AÒadido contactado: %s, Numero de usuarios conectados: %d \n", usuario, lista->num);
+		printf("Flag:A√±adido contactado: %s, Numero de usuarios conectados: %d \n", usuario, lista->num);
 	}
 }
 int EliminaConectado(ListaJugadores *lista, char usuario[20]){
@@ -142,8 +142,8 @@ void EnviarInformacionLobby (ListaLobbies *ListaLobbies, char *respuesta){
 }
 
 void EnviarMensaje(ListaLobbies *ListaLobbies,ListaJugadores *lista, int RoomID, int TipoMensaje2, char MensajeAEnviar[1024], char *respuesta){
-    // El cliente enviar· un mensaje a partir de una interfaz con un codigo asociado.
-	// Ese mensaje se distribuir· a todos los clientes, y estos discerniran si pueden
+    // El cliente enviar√° un mensaje a partir de una interfaz con un codigo asociado.
+	// Ese mensaje se distribuir√° a todos los clientes, y estos discerniran si pueden
 	// recibir el mensaje o no segun si se encuentran en la ventana que tenga el codigo respectivo
 	// Codigo1 0 = Menu principal (Chat general)
 	// Codigo1 = 1 ; Codigo2 = X : Se manda el mensaje a todos los jugadores de la sala X
@@ -162,7 +162,7 @@ void EnviarMensaje(ListaLobbies *ListaLobbies,ListaJugadores *lista, int RoomID,
 	
 }
 
-int AnadirJugadorASala(ListaJugadores *lista, ListaLobbies *ListaLobbies, char usuario[128], int RoomID){ // Retrona 1 si se aÒadio correctamente, 0 si no
+int AnadirJugadorASala(ListaJugadores *lista, ListaLobbies *ListaLobbies, char usuario[128], int RoomID){ // Retrona 1 si se a√±adio correctamente, 0 si no
 	int i= 0;
 	while(i< lista->num){
 		if(strcmp(lista->jugadores[i].Usuario,usuario) == 0 && lista->jugadores[i].EnPartida == 1){
@@ -181,7 +181,7 @@ int AnadirJugadorASala(ListaJugadores *lista, ListaLobbies *ListaLobbies, char u
 				printf("Flag:Buscando Comparacion %s  --  %s ", lista->jugadores[j].Usuario,usuario);
 				if(strcmp(lista->jugadores[j].Usuario,usuario) == 0){
 					ListaLobbies->Lobby[i].Jugador[ListaLobbies->Lobby[i].numJugadores] = lista->jugadores[j];
-					printf("Flag:Jugador aÒadido a partida: %s\n", ListaLobbies->Lobby[i].Jugador[ListaLobbies->Lobby[i].numJugadores].Usuario );
+					printf("Flag:Jugador a√±adido a partida: %s\n", ListaLobbies->Lobby[i].Jugador[ListaLobbies->Lobby[i].numJugadores].Usuario );
 					ListaLobbies->Lobby[i].numJugadores = ListaLobbies->Lobby[i].numJugadores + 1;
 					return 1;
 				}
@@ -197,7 +197,7 @@ int AnadirJugadorASala(ListaJugadores *lista, ListaLobbies *ListaLobbies, char u
 	}
 	return 0;
 }
-int EliminarJugadorSala(ListaLobbies *ListaLobbies, char usuario[128], int RoomID){ // Retrona 1 si se aÒadio correctamente, 0 si no
+int EliminarJugadorSala(ListaLobbies *ListaLobbies, char usuario[128], int RoomID){ // Retrona 1 si se a√±adio correctamente, 0 si no
 	int i= 0;
 	int j = 0;
 	while(i< ListaLobbies->num){
@@ -254,6 +254,7 @@ int CrearSala(ListaLobbies *ListaLobbies, ListaJugadores *listaJ, char NombreLob
 				strcat(respuesta, RespuestaTemp);
 				write (listaJ->jugadores[i].Socket,respuesta, strlen(respuesta));
 			}
+			i = i+1;
 		}
 		ListaLobbies->num = ListaLobbies->num + 1;
 		printf("Flag: Sala %d ha sido creada por %s\n",ListaLobbies->Lobby[ListaLobbies->num-1].ID_Lobby, UsuarioQueEnvia);
@@ -263,7 +264,7 @@ int CrearSala(ListaLobbies *ListaLobbies, ListaJugadores *listaJ, char NombreLob
 	   return 0;
 }
 int ComprobarContrasena(MYSQL *conn, char password[40], char nombre_Usuario[40]){
-	//Retorna 1 si la contraseÒa y el usuario pasados por parametro coinciden	
+	//Retorna 1 si la contrase√±a y el usuario pasados por parametro coinciden	
 	int checked;
 	MYSQL_RES *resultado;
 	MYSQL_ROW fila;
@@ -284,34 +285,7 @@ int ComprobarContrasena(MYSQL *conn, char password[40], char nombre_Usuario[40])
 		checked = 0;	//No se ha pasado ningun dato, esta vacio
 	
 	else{
-		checked = 1;	//Si la contraseÒa y el usuario SÕ coinciden
-	}
-	return checked;
-}
-
-int Conquienhejugado(MYSQL *conn, char  nombre_Usuario[40]){
-	//Retorna 1 si la contraseÒa y el usuario pasados por parametro coinciden	
-	int checked;
-	MYSQL_RES *resultado;
-	MYSQL_ROW fila;
-	char consulta[500];
-	sprintf(consulta,"SELECT jugador.username from (jugador,participacion, partida) WHERE jugador.username ='%s' AND jugador.id  = participacion.id_jugador AND participacion.id_partida", nombre_Usuario);
-	
-	int err;
-	err = mysql_query(conn, consulta);
-	if (err!=0){
-		printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn),mysql_error(conn));
-		exit(1);
-	}
-	
-	resultado = mysql_store_result(conn);
-	fila = mysql_fetch_row(resultado);
-	
-	if(fila == NULL)
-		checked = 0;	//No se ha pasado ningun dato, esta vacio
-	
-	else{
-		checked = 1;	//Si la contraseÒa y el usuario SÕ coinciden
+		checked = 1;	//Si la contrase√±a y el usuario S√ç coinciden
 	}
 	return checked;
 }
@@ -342,6 +316,95 @@ void DarDeBaja(MYSQL *conn, char nombre_Usuario[20]){
 		exit(1);
 	}
 }
+void ConQuienHeJugado(MYSQL *conn, char *respuesta, char nombre_Usuario[40]){
+	//Retorna 1 si la contrase√±a y el usuario pasados por parametro coinciden	
+	int checked;
+	MYSQL_RES *resultado;
+	MYSQL_ROW fila;
+	char consulta[2048];
+	sprintf(consulta,"SELECT DISTINCT jugador.username FROM (jugador, participacion) WHERE participacion.id_partida= ANY(SELECT participacion.id_partida FROM (jugador, participacion) WHERE jugador.username = '%s' AND jugador.id = participacion.id_jugador) AND participacion.id_jugador = jugador.id;", nombre_Usuario);  
+	
+	int err;
+	err = mysql_query(conn, consulta);
+	if (err!=0){
+		printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn),mysql_error(conn));
+		exit(1);
+	}
+	printf("Flag1\n");
+	sprintf(respuesta,"%s*150/",respuesta);
+	resultado = mysql_store_result(conn);
+	fila = mysql_fetch_row(resultado);
+	printf("Flag2\n");
+	if(fila == NULL)
+		sprintf(respuesta,"%s|Ninguno(Vacio)",respuesta);	
+	else{ 
+		while(fila != NULL){
+			sprintf(respuesta,"%s|%s", respuesta, fila[0]);
+			fila = mysql_fetch_row(resultado);
+		}
+	}
+	printf("Flag1\n");
+	strcat(respuesta, "*");	
+} 
+
+void QuePartidasJugueConX(MYSQL *conn, char *respuesta, char nombre_Usuario[40], char nombre_otro[40]){
+	int checked;
+	MYSQL_RES *resultado;
+	MYSQL_ROW fila;
+	char consulta[2048];
+	sprintf(consulta,"SELECT DISTINCT partida.ganador,partida.fecha FROM (jugador, participacion,partida) WHERE partida.id = ANY(SELECT DISTINCT participacion.id_partida FROM (jugador, participacion) WHERE jugador.username = '%s' AND jugador.id = participacion.id_jugador AND participacion.Id_partida= ANY(SELECT participacion.id_partida FROM (jugador, participacion) WHERE jugador.username = '%s' AND jugador.id = participacion.id_jugador)) ", nombre_Usuario, nombre_otro);   // REVISAR ; NOSE SI HACE FALTA
+	int err;
+	err = mysql_query(conn, consulta);
+	if (err!=0){
+		printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn),mysql_error(conn));
+		exit(1);
+	}
+	sprintf(respuesta,"%s*151/",respuesta);
+	resultado = mysql_store_result(conn);
+	fila = mysql_fetch_row(resultado);
+	
+	if(fila == NULL)
+		sprintf(respuesta,"%s||Ninguno(Vacio)|Nada",respuesta);	
+	
+	else{ 
+		while(fila != NULL){
+			sprintf(respuesta,"%s||%s|%s", respuesta, fila[0],fila[1]);
+			fila = mysql_fetch_row(resultado);
+		}
+	}
+	strcat(respuesta, "*");	
+} 
+
+void QuePartidasTalDia(MYSQL *conn, char *respuesta, char dia[40]){
+	//Retorna 1 si la contrase√±a y el usuario pasados por parametro coinciden	
+	int checked;
+	MYSQL_RES *resultado;
+	MYSQL_ROW fila;
+	char consulta[2048];
+	sprintf(consulta," SELECT DISTINCT partida.ganador,partida.id FROM (partida) WHERE partida.fecha = '%s'", dia);   
+	
+	int err;
+	err = mysql_query(conn, consulta);
+	if (err!=0){
+		printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn),mysql_error(conn));
+		exit(1);
+	}
+	
+	sprintf(respuesta,"%s*152/",respuesta);
+	resultado = mysql_store_result(conn);
+	fila = mysql_fetch_row(resultado);
+	
+	if(fila == NULL)
+		sprintf(respuesta,"%s||Ninguno(Vacio)|Nada",respuesta);		
+	
+	else{ 
+		while(fila != NULL){
+			sprintf(respuesta,"%s||%s|%s", respuesta, fila[0],fila[1]);
+			fila = mysql_fetch_row(resultado);
+		}
+	}
+	strcat(respuesta, "*");
+} 
 int UsuarioRegistrado(MYSQL *conn, char nombre_Usuario[20]){
 	//Retorna 1 si el usuario ya esta en la base de datos
 	//Retorna 0 si no esta registrado
@@ -367,7 +430,7 @@ int UsuarioRegistrado(MYSQL *conn, char nombre_Usuario[20]){
 
 
 int ComprobarContrasenaFn(MYSQL *conn, char password[40], char nombre_Usuario[40]){
-	//Retorna 1 si la contraseÒa y el usuario pasados por parametro coinciden	
+	//Retorna 1 si la contrase√±a y el usuario pasados por parametro coinciden	
 	int checked;
 	MYSQL_RES *resultado;
 	MYSQL_ROW fila;
@@ -388,7 +451,7 @@ int ComprobarContrasenaFn(MYSQL *conn, char password[40], char nombre_Usuario[40
 		checked = 0;	//No se ha pasado ningun dato, esta vacio
 	
 	else{
-		checked = 1;	//Si la contraseÒa y el usuario SÕ coinciden
+		checked = 1;	//Si la contrase√±a y el usuario S√ç coinciden
 	}
 	return checked;
 }
@@ -422,7 +485,7 @@ void EnviarInvitacion(ListaLobbies *ListaLobbies,ListaJugadores *lista, char Usu
 	for(int i= 0; i < lista->num; i++){
 		if(strcmp(lista->jugadores[i].Usuario,UsuarioInvitado) == 0){
 			sprintf(Envio, "34/%d|%s", IdSala,DescripcionSala);
-			printf("Flag : Envio de invitaciÛn a: %s",UsuarioInvitado);
+			printf("Flag : Envio de invitaci√≥n a: %s",UsuarioInvitado);
 			write (lista->jugadores[i].Socket,Envio, strlen(Envio));
 		}
 	}
@@ -434,8 +497,7 @@ void EmpezarPartida( ListaLobbies *ListaLobbies, int ID_Sala, char *RespuestaGen
 	sprintf(RespuestaGeneral,"%s*50/", RespuestaGeneral);
 	for(int i = 0 ; i < ListaLobbies->num ; i ++ ){
 		if(ListaLobbies->Lobby[i].ID_Lobby== ID_Sala){
-			AsesinoRandom = rand() % (ListaLobbies->Lobby[i].numJugadores);
-			printf("Asesino: Numero de jugadores: %d  %d",AsesinoRandom, ListaLobbies->Lobby[i].numJugadores);
+			AsesinoRandom = rand() % ListaLobbies->Lobby[i].numJugadores-1;
 			for(int j = 0; j < ListaLobbies->Lobby[i].numJugadores; j++){
 				
 				ListaLobbies->Lobby[i].Jugador[j].Personaje.PosicionX = 1350 + PosicionMultiX * 100;
@@ -462,16 +524,14 @@ void ActualizarPosicion(ListaLobbies *ListaLobbies, int ID_Sala, char *Respuesta
 	for(int i = 0 ; i < ListaLobbies->num ; i ++ ){
 		if(ListaLobbies->Lobby[i].ID_Lobby== ID_Sala){
 			for(int j = 0; j < ListaLobbies->Lobby[i].numJugadores; j++){
-				if(strcmp(ListaLobbies->Lobby[i].Jugador[j].Usuario, UsuarioLocal)== 0){
+				if(strcmp(ListaLobbies->Lobby[i].Jugador[j].Usuario, UsuarioLocal)){
 					ListaLobbies->Lobby[i].Jugador[j].Personaje.PosicionX =  PosX;
 					ListaLobbies->Lobby[i].Jugador[j].Personaje.PosicionY = PosY;
 					ListaLobbies->Lobby[i].Jugador[j].Personaje.Vivo = Vivo;
 					ListaLobbies->Lobby[i].Jugador[j].Personaje.Tareas = Tareas;
 					sprintf(RespuestaGeneral, "%s|^|%d||%s||%d|%d|%d|%d", RespuestaGeneral  ,ID_Sala, ListaLobbies->Lobby[i].Jugador[j].Usuario  ,ListaLobbies->Lobby[i].Jugador[j].Personaje.PosicionX  ,ListaLobbies->Lobby[i].Jugador[j].Personaje.PosicionY  ,ListaLobbies->Lobby[i].Jugador[j].Personaje.Vivo  ,ListaLobbies->Lobby[i].Jugador[j].Personaje.Tareas);
-					//if(Vivo== 0){
-					//	EliminarJugadorSala(ListaLobbies,UsuarioLocal,ID_Sala);
-					//}
 				}
+				
 			}
 		}
 	}
@@ -495,6 +555,8 @@ void HaMuerto(ListaLobbies *ListaLobbies, int ID_Sala, char *RespuestaGeneral, c
 	strcat(RespuestaGeneral,"*");
 }
 
+
+
 //#######################
 //#== ATENDER CLIENTE ==#
 //#######################
@@ -509,7 +571,7 @@ void *AtenderCliente(void *socket){
 		exit (1);
 	}
 	
-	conn =mysql_real_connect(conn, "localhost", "root","mysql", "juego",0, NULL, 0);
+	conn =mysql_real_connect(conn, "shiva2.upc.es", "root","mysql", "juego",0, NULL, 0);
 	if (conn == NULL){
 		printf("Error al crear la conexion");
 		exit(1);
@@ -552,9 +614,9 @@ void *AtenderCliente(void *socket){
 		char desconex[5];
 		ret = read(sock_conn,peticion, sizeof(peticion));
 		printf ("Recibido\n");
-		// Tenemos que aÒadirle la marca de fin de string 
+		// Tenemos que a√±adirle la marca de fin de string 
 		// para que no escriba lo que hay despues en el buffer
-		if(ret == 0){
+		if(ret <= 0){
 			pthread_mutex_lock( &mutex );
 			end = 1;	//Fin del bucle
 			EliminaConectado(&ListaJugador, UsuarioLocal);
@@ -568,7 +630,7 @@ void *AtenderCliente(void *socket){
 			p = strtok( peticion, "/");
 			int codigo =  atoi (p);
 			//Tenemos el codigo de la peticion
-			// 1/Juan/contraseÒa
+			// 1/Juan/contrase√±a
 			if (codigo == 0 || ret == 0 ){	//Peticion de desconexion
 				pthread_mutex_lock( &mutex );
 				end = 1;	//Fin del bucle
@@ -631,8 +693,29 @@ void *AtenderCliente(void *socket){
 				DarDeBaja(conn, UsuarioLocal);
 				EliminaConectado(&ListaJugador, UsuarioLocal);
 			}
-			else if (codigo == 6){	//Consulta los jugadores que jugaron el dia 29/05/2021
+			else if (codigo == 6){	//Consulta todos los jugadores con los que he jugado
+				pthread_mutex_lock( &mutex );
+				ConQuienHeJugado(conn,respuesta,UsuarioLocal);
+				pthread_mutex_unlock( &mutex );
+			}
+			else if (codigo == 7){	//Consulta todas las partidas que he jugado con un jugador
+				pthread_mutex_lock( &mutex );
+				p = strtok(NULL, "/");
+				strcpy(nombre_Generico, p);
+				QuePartidasJugueConX(conn, respuesta, UsuarioLocal, nombre_Generico);
 				
+				
+				pthread_mutex_unlock( &mutex );
+			}
+			else if (codigo == 8){	//Consultas todas las partidas que se han jugado tal dia
+				pthread_mutex_lock( &mutex );
+				
+				p = strtok(NULL, "*");
+				strcpy(nombre_Generico, p);
+				printf("Dia : %s \n" , nombre_Generico);
+				QuePartidasTalDia(conn,respuesta,nombre_Generico);
+				
+				pthread_mutex_unlock( &mutex );
 			}
 			else if (codigo == 30){	//Solicitud crear una sala de lobby
 				pthread_mutex_lock( &mutex );
@@ -646,16 +729,13 @@ void *AtenderCliente(void *socket){
 				pthread_mutex_unlock( &mutex );
 				
 			}
-			else if (codigo == 31){	//Usuario se ha unido y necesitamos actualizar la informaciÛn del lobby
+			else if (codigo == 31){	//Usuario se ha unido y necesitamos actualizar la informaci√≥n del lobby
 				pthread_mutex_lock( &mutex );
-				printf("\nFLAG : RespuestaGen0 : %s\n",RespuestaGeneral);
 				EnviarInformacionLobby(&ListaLobby, RespuestaGeneral);
-				printf("FLAG : RespuestaGen1 : %s\n",RespuestaGeneral);
 				EnviarListaConectados(&ListaJugador, RespuestaGeneral);
-				printf("FLAG : RespuestaGen2 : %s\n\n",RespuestaGeneral);
 				pthread_mutex_unlock( &mutex );
 			}
-			else if (codigo == 32){	// AÒadir Jugador a sala 
+			else if (codigo == 32){	// A√±adir Jugador a sala 
 				pthread_mutex_lock( &mutex );
 				p = strtok(NULL, "/");
 				Codigo1 = atoi(p);
@@ -687,33 +767,26 @@ void *AtenderCliente(void *socket){
 				pthread_mutex_unlock( &mutex );
 			}
 			else if (codigo == 41){	// Iniciar partida; Enviar informacion inicial
-				printf("RET %d \n",ret);
-				if(ret > 2){
-					pthread_mutex_lock( &mutex );				
-					p = strtok(NULL, "/");
-					Codigo1 = atoi(p);
-					EmpezarPartida(&ListaLobby, Codigo1, RespuestaGeneral);
-					pthread_mutex_unlock( &mutex );
-				}
+				pthread_mutex_lock( &mutex );				
+				p = strtok(NULL, "/");
+				Codigo1 = atoi(p);
+				EmpezarPartida(&ListaLobby, Codigo1, RespuestaGeneral);
+				pthread_mutex_unlock( &mutex );
 			}
 			else if (codigo == 42){	//Cambio de color de jugador
-				printf("RET %d \n",ret);
-				if(ret > 2){
-					pthread_mutex_lock( &mutex );
-					p = strtok(NULL, "/");
-					Codigo1 = atoi(p);
-					p = strtok(NULL, "/");
-					Codigo2 = atoi(p);
-					p = strtok(NULL, "/");
-					Codigo3 = atoi(p);
-					p = strtok(NULL, "/");
-					Codigo4 = atoi(p);
-					p = strtok(NULL, "/");
-					Codigo5 = atoi(p);
-					ActualizarPosicion(&ListaLobby,Codigo1,RespuestaGeneral,UsuarioLocal,Codigo2, Codigo3,Codigo4,Codigo5);
-					pthread_mutex_unlock( &mutex );
-				}
-				
+				pthread_mutex_lock( &mutex );
+				p = strtok(NULL, "/");
+				Codigo1 = atoi(p);
+				p = strtok(NULL, "/");
+				Codigo2 = atoi(p);
+				p = strtok(NULL, "/");
+				Codigo3 = atoi(p);
+				p = strtok(NULL, "/");
+				Codigo4 = atoi(p);
+				p = strtok(NULL, "/");
+				Codigo5 = atoi(p);
+				ActualizarPosicion(&ListaLobby,Codigo1,RespuestaGeneral,UsuarioLocal,Codigo2, Codigo3,Codigo4,Codigo5);
+				pthread_mutex_unlock( &mutex );
 			}
 			else if (codigo == 43){	//     ASESINATO!!
 				pthread_mutex_lock( &mutex );
@@ -763,7 +836,7 @@ void *AtenderCliente(void *socket){
 int main(int argc, char *argv[]){
 	int n;
 	int sock_conn, sock_listen, ret;
-	int PORT = 9040;
+	int PORT = 50077;
 	struct sockaddr_in serv_adr;
 	if ((sock_listen = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		printf("Error creant socket");
