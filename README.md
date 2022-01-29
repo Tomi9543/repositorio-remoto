@@ -28,4 +28,10 @@ Conexión entre dos jugadores
   **Comunicador** : Irina Castella Torrus  
   **Verificador** : Oscar Samblas Chavernas  
   https://drive.google.com/file/d/1-TkvGDEz7CCveEK92zzrb44Bdy2twW7W/view?usp=sharing
+  
+# Version Final
+la version definitiva del juego 
+  **Manager** : Tomi Riccardo Sandu Lefcu
+  **Comunicador** : Irina Castella Torrus  
+  **Verificador** : Oscar Samblas Chavernas  
 
