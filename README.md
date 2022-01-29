@@ -30,9 +30,10 @@ Conexión entre dos jugadores
   https://drive.google.com/file/d/1-TkvGDEz7CCveEK92zzrb44Bdy2twW7W/view?usp=sharing
   
 # Version Final
-la version definitiva del juego  
+La versión definitiva del juego  
   **Manager** : Tomi Riccardo Sandu Lefcu  
   **Comunicador** : Irina Castella Torrus  
   **Verificador** : Oscar Samblas Chavernas  
   El cliente pesa demasiado para github : https://drive.google.com/file/d/1FlQXeFn7vwR486nrJgLUU3Sc72syyrlf/view?usp=sharing
+  Vídeo demostrativo: https://drive.google.com/file/d/17divVPLRIofU3HBp0RDQVbkK2TOQXHYN/view?usp=sharing
 
